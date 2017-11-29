@@ -35,7 +35,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URLEncoder;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -46,7 +45,6 @@ class Utils {
 
     final static String KEY_LOCATION_UPDATES_REQUESTED = "location-updates-requested";
     final static String KEY_LOCATION_UPDATES_RESULT = "location-update-result";
-    final static SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     static void setRequestingLocationUpdates(Context context, boolean value) {
         PreferenceManager.getDefaultSharedPreferences(context)
@@ -117,7 +115,7 @@ class Utils {
     static String getLocationResultTitle(Context context, List<Location> locations) {
         String numLocationsReported = context.getResources().getQuantityString(
                 R.plurals.num_locations_reported, locations.size(), locations.size());
-        return numLocationsReported + ": " + SIMPLE_DATE_FORMAT.format(new Date());
+        return numLocationsReported + ": " + BackendSettings.SIMPLE_DATE_FORMAT.format(new Date());
     }
 
     /**
@@ -241,6 +239,7 @@ class Utils {
                     String phoneNumber = smsMessage.getDisplayOriginatingAddress();
                     String message = smsMessage.getDisplayMessageBody();
                     String datetime = "" + smsMessage.getTimestampMillis();
+                    Log.d("Sender", "sms date" + datetime);
                     String line =  datetime + ";" + URLEncoder.encode(phoneNumber, "utf-8") + ";" + URLEncoder.encode(message, "utf-8") + "\r\n";
 
                     Log.v("Sender", line);

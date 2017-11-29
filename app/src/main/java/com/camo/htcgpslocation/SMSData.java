@@ -12,7 +12,19 @@ public class SMSData {
         Datetime = datetime;
     }
 
-    public String PhoneNumber;
-    public String Message;
-    public String Datetime;
+    private String PhoneNumber;
+    private String Message;
+    private String Datetime;
+
+    public String getPhoneNumber(){
+        return PhoneNumber;
+    }
+
+    public String getMessage(){
+        return Message;
+    }
+
+    public String getDatetime(){
+        return Datetime;
+    }
 }

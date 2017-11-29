@@ -59,19 +59,19 @@ public class MainActivity extends FragmentActivity implements
     /**
      * The desired interval for location updates. Inexact. Updates may be more or less frequent.
      */
-    private static final long UPDATE_INTERVAL = LocationRequestSettings.UPDATE_INTERVAL; // Every 60 seconds.
+    private static final long UPDATE_INTERVAL = BackendSettings.UPDATE_INTERVAL; // Every 60 seconds.
 
     /**
      * The fastest rate for active location updates. Updates will never be more frequent
      * than this value, but they may be less frequent.
      */
-    private static final long FASTEST_UPDATE_INTERVAL = LocationRequestSettings.FASTEST_UPDATE_INTERVAL; // Every 30 seconds
+    private static final long FASTEST_UPDATE_INTERVAL = BackendSettings.FASTEST_UPDATE_INTERVAL; // Every 30 seconds
 
     /**
      * The max time before batched results are delivered by location services. Results may be
      * delivered sooner than this interval.
      */
-    private static final long MAX_WAIT_TIME = LocationRequestSettings.MAX_WAIT_TIME; // Every 5 minutes.
+    private static final long MAX_WAIT_TIME = BackendSettings.MAX_WAIT_TIME; // Every 5 minutes.
 
     /**
      * Stores parameters for requests to the FusedLocationProviderApi.
@@ -163,7 +163,7 @@ public class MainActivity extends FragmentActivity implements
         // application will never receive updates faster than this value.
         mLocationRequest.setFastestInterval(FASTEST_UPDATE_INTERVAL);
 
-        mLocationRequest.setPriority(LocationRequestSettings.REQUEST_PRIORITY);
+        mLocationRequest.setPriority(BackendSettings.REQUEST_PRIORITY);
 
         // Sets the maximum time when batched location updates are delivered. Updates may be
         // delivered sooner than this interval.
@@ -360,7 +360,7 @@ public class MainActivity extends FragmentActivity implements
 
     public void startAlarm() {
         AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        int interval = LocationRequestSettings.ALARM_INTERVAL;
+        int interval = BackendSettings.ALARM_INTERVAL;
 
         manager.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), interval, pendingIntent);
         Toast.makeText(this, "Alarm Set", Toast.LENGTH_SHORT).show();

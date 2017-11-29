@@ -27,10 +27,6 @@
             </intent-filter>
         </activity>
 
-        <service
-            android:name=".LocationUpdatesIntentService"
-            android:exported="false" />
-
         <service android:name=".UploadService" >
         </service>
 

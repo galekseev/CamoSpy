@@ -11,14 +11,14 @@ import android.util.Log;
 
 public class AlarmReceiver extends BroadcastReceiver {
 
+    private static final String TAG = "AlarmReceiver";
+
     @Override
     public void onReceive(Context context, Intent intent) {
 
-        Log.d("AlarmReceiver", "Alarm received");
+        Log.v(TAG, "Alarm received");
 
         Intent uploadIntent = new Intent(context, UploadService.class);
         context.startService(uploadIntent);
-        // For our recurring task, we'll just display a message
-        //Toast.makeText(context, "I'm running", Toast.LENGTH_SHORT).show();
     }
 }

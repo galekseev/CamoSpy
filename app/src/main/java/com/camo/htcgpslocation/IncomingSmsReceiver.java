@@ -19,7 +19,6 @@ public class IncomingSmsReceiver extends BroadcastReceiver {
 
     private static final String TAG = "IncomingSmsReceiver";
 
-
     public void onReceive(Context context, Intent intent) {
 
         Log.v(TAG, "Sms incoming");

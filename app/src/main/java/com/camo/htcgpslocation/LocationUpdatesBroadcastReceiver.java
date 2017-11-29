@@ -43,8 +43,7 @@ public class LocationUpdatesBroadcastReceiver extends BroadcastReceiver {
     private static final String TAG = "LUBroadcastReceiver";
 
     static final String ACTION_PROCESS_UPDATES =
-            "com.camo.htcgpslocation.action" +
-                    ".PROCESS_UPDATES";
+            "com.camo.htcgpslocation.action.PROCESS_UPDATES";
 
     @Override
     public void onReceive(Context context, Intent intent) {

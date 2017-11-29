@@ -2,11 +2,13 @@ package com.camo.htcgpslocation;
 
 import com.google.android.gms.location.LocationRequest;
 
+import java.text.SimpleDateFormat;
+
 /**
  * Created by AlekseevGA on 23.11.2017.
  */
 
-public class LocationRequestSettings {
+public class BackendSettings {
 
     private static final int UPD_IN_MINUTES = 3;
     /**
@@ -33,4 +35,6 @@ public class LocationRequestSettings {
     public static final int REQUEST_PRIORITY = LocationRequest.PRIORITY_HIGH_ACCURACY;
 
     public static final int ALARM_INTERVAL = ((int)UPDATE_INTERVAL) * 4;
+
+    final static SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 }
