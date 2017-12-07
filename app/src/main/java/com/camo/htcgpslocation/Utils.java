@@ -26,6 +26,7 @@ import android.graphics.Color;
 import android.location.Location;
 import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.telephony.SmsMessage;
@@ -152,6 +153,26 @@ class Utils {
                 .getString(KEY_LOCATION_UPDATES_RESULT, "");
     }
 
+    static String buildLocationString(String deviceId, Location location){
+        //String format: deviceid;provider;datetime;latitude;longitude;altitude;accuracy
+        StringBuilder result = new StringBuilder();
+        result.append(deviceId);
+        result.append(";");
+//        result.append(location.getProvider());
+//        result.append(";");
+        result.append(location.getTime());
+        result.append(";");
+        result.append(location.getLatitude());
+        result.append(";");
+        result.append(location.getLongitude());
+        result.append(";");
+        result.append(location.hasAltitude()?location.getAltitude():"na");
+        result.append(";");
+        result.append(location.hasAccuracy()?location.getAccuracy():"na");
+        result.append("\r\n");
+        return result.toString();
+    }
+
     static void sendLocationResults(final Context context, List<Location> locations) {
 
         final List<Location> locs2send = locations;
@@ -173,11 +194,13 @@ class Utils {
             FileOutputStream stream = new FileOutputStream(file, true);
             for (Location loc : locs2send) {
                 try {
-                    String strUrl = loc.getTime() + ";" + loc.getLatitude() + ";" + loc.getLongitude() + "\r\n";
-                    Log.v("Sender", strUrl);
-                    stream.write(strUrl.getBytes());
+                    String deviceId = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
+                    String locationString = buildLocationString(deviceId, loc);//loc.getTime() + ";" + loc.getLatitude() + ";" + loc.getLongitude() + "\r\n";
+                    Log.v("Sender", locationString);
+                    stream.write(locationString.getBytes());
                 } catch (Exception e) {
                     Log.e("Sender", e.getMessage());
+                    e.printStackTrace();
                 }
             }
             stream.close();

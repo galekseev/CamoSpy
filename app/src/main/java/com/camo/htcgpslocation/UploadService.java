@@ -23,6 +23,7 @@ public class UploadService extends IntentService{
     private static final String TAG = "UploadService";
     public static final String LOCATION_STORAGE = "loc.log";
     public static final String MESSAGE_STORAGE = "mes.log";
+    private static final String UPLOAD_URL = "http://www.miravto.ru/agps2.php";
 
     public UploadService(){
         super("UploadService");
@@ -34,11 +35,14 @@ public class UploadService extends IntentService{
         Log.d(TAG, "Alarm intent running");
         LocationData[] data = readLocationStorage();
         if (data != null && data.length>0) {
+            Log.v(TAG, "Locations found: "+data.length);
             uploadSuccess = uploadData(data);
             if (uploadSuccess) {
                 deleteStorage(LOCATION_STORAGE);
-                Log.v(TAG, "No locations found");
             }
+        }
+        else {
+            Log.v(TAG, "No locations found");
         }
 
         if (uploadSuccess){
@@ -131,6 +135,29 @@ public class UploadService extends IntentService{
         }
     }
 
+    private String buildLocationURL(LocationData location){
+        StringBuilder url = new StringBuilder();
+        url.append(UPLOAD_URL);
+
+        url.append("?lat=");
+        url.append(location.getLatitude());
+        url.append("&lon=");
+        url.append(location.getLatitude());
+        url.append("&t=");
+        url.append(location.getDatetime());
+
+//        url.append("&p=");
+//        url.append(location.getProvider());
+        url.append("&a=");
+        url.append(location.getAccuracy());
+        url.append("&alt=");
+        url.append(location.getAltitude());
+        url.append("&id=");
+        url.append(location.getDeviceId());
+
+        return url.toString();
+    }
+
     private boolean uploadData(LocationData[] locations) {
         boolean success = false;
 
@@ -139,7 +166,7 @@ public class UploadService extends IntentService{
         for (LocationData loc : locations) {
             HttpURLConnection urlConnection = null;
             try {
-                String strUrl = "http://www.miravto.ru/agps.php?lat=" + loc.getLatitude() + "&lon=" + loc.getLongitude() + "&t=" + loc.getDatetime();
+                String strUrl = buildLocationURL(loc);//UPLOAD_URL + "?lat=" + loc.getLatitude() + "&lon=" + loc.getLongitude() + "&t=" + loc.getDatetime();
                 Log.i(TAG, strUrl);
                 URL url = new URL(strUrl);
                 urlConnection = (HttpURLConnection) url.openConnection();
@@ -169,15 +196,12 @@ public class UploadService extends IntentService{
         try {
             BufferedReader br = new BufferedReader(new FileReader(file));
             String line;
-            String[] parts;
 
             while ((line = br.readLine()) != null) {
-                parts = line.split(";");
-                if (parts.length == 3)
-                {
-                    LocationData data = new LocationData(parts[0], parts[1], parts[2]);
+                //Log.v(TAG, line);
+                LocationData data = createLocationFromString(line);
+                if (data != null)
                     locations.add(data);
-                }
             }
             br.close();
             return  locations.toArray(new LocationData[locations.size()]);
@@ -185,7 +209,15 @@ public class UploadService extends IntentService{
             Log.e(TAG, e.getMessage());
             return null;
         }
+    }
 
+    private LocationData createLocationFromString(String csvString){
+        //String format: deviceid;/*provider*/;datetime;latitude;longitude;altitude;accuracy
+        String[] parts = csvString.split(";");
+        if (parts.length < 6)
+            return null;
+
+        return new LocationData(parts[0], parts[1], parts[2], parts[3], parts[4], parts[5]);
     }
 }
 
