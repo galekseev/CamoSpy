@@ -108,6 +108,7 @@ public class UploadService extends IntentService{
             return  smslist.toArray(new SMSData[smslist.size()]);
         } catch (IOException e){
             Log.e(TAG, e.getMessage());
+            e.printStackTrace();
             return null;
         }
     }
