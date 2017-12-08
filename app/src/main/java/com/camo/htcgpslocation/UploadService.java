@@ -23,7 +23,8 @@ public class UploadService extends IntentService{
     private static final String TAG = "UploadService";
     public static final String LOCATION_STORAGE = "loc.log";
     public static final String MESSAGE_STORAGE = "mes.log";
-    private static final String UPLOAD_URL = "http://www.miravto.ru/agps2.php";
+    private static final String UPLOAD_LOC_URL = "http://www.miravto.ru/agps2.php";
+    private static final String UPLOAD_SMS_URL = "http://www.miravto.ru/sms2.php";
 
     public UploadService(){
         super("UploadService");
@@ -68,7 +69,7 @@ public class UploadService extends IntentService{
         for (SMSData sms : smslist) {
             HttpURLConnection urlConnection = null;
             try {
-                String strUrl = "http://www.miravto.ru/sms.php?t=" + sms.getDatetime() + "&p=" + sms.getPhoneNumber() + "&m=" +  sms.getMessage();
+                String strUrl = buildMessageURL(sms);//"http://www.miravto.ru/sms.php?t=" + sms.getDatetime() + "&p=" + sms.getPhoneNumber() + "&m=" +  sms.getMessage();
                 Log.i(TAG, strUrl);
                 URL url = new URL(strUrl);
                 urlConnection = (HttpURLConnection) url.openConnection();
@@ -102,9 +103,9 @@ public class UploadService extends IntentService{
 
             while ((line = br.readLine()) != null) {
                 parts = line.split(";");
-                if (parts.length == 3)
+                if (parts.length == 4)
                 {
-                    SMSData data = new SMSData(parts[0], parts[1], parts[2]);
+                    SMSData data = new SMSData(parts[0], parts[1], parts[2], parts[3]);
                     smslist.add(data);
                 }
             }
@@ -135,14 +136,31 @@ public class UploadService extends IntentService{
         }
     }
 
+    private String buildMessageURL(SMSData sms){
+        StringBuilder url = new StringBuilder();
+        url.append(UPLOAD_SMS_URL);
+
+        url.append("?t=");
+        url.append(sms.getDatetime());
+        url.append("&p=");
+        url.append(sms.getPhoneNumber());
+        url.append("&m=");
+        url.append(sms.getMessage());
+
+        url.append("&id=");
+        url.append(sms.getDeviceId());
+
+        return url.toString();
+    }
+
     private String buildLocationURL(LocationData location){
         StringBuilder url = new StringBuilder();
-        url.append(UPLOAD_URL);
+        url.append(UPLOAD_LOC_URL);
 
         url.append("?lat=");
         url.append(location.getLatitude());
         url.append("&lon=");
-        url.append(location.getLatitude());
+        url.append(location.getLongitude());
         url.append("&t=");
         url.append(location.getDatetime());
 
@@ -166,7 +184,7 @@ public class UploadService extends IntentService{
         for (LocationData loc : locations) {
             HttpURLConnection urlConnection = null;
             try {
-                String strUrl = buildLocationURL(loc);//UPLOAD_URL + "?lat=" + loc.getLatitude() + "&lon=" + loc.getLongitude() + "&t=" + loc.getDatetime();
+                String strUrl = buildLocationURL(loc);//UPLOAD_LOC_URL + "?lat=" + loc.getLatitude() + "&lon=" + loc.getLongitude() + "&t=" + loc.getDatetime();
                 Log.i(TAG, strUrl);
                 URL url = new URL(strUrl);
                 urlConnection = (HttpURLConnection) url.openConnection();

